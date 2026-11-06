@@ -1,1 +1,194 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROOMIX — Дизайн интерьера</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101114;color:#f5f5f5;font-family:Arial,sans-serif;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.logo{font-size:27px;font-weight:900;letter-spacing:3px}
+.logo span{color:#c8a77b}
+.tag{color:#999;font-size:12px}
+h1{font-size:29px;margin:10px 0}
+p{color:#aaa;line-height:1.5}
+.card{background:#1c1d21;border:1px solid #303137;border-radius:17px;padding:17px;margin:16px 0}
+h2{font-size:17px;margin:0 0 15px}
+.upload{border:1px dashed #777;border-radius:13px;padding:28px 12px;text-align:center;cursor:pointer;color:#ccc;display:block}
+.upload input{display:none}
+#preview{width:100%;border-radius:12px;margin-top:12px;display:none}
+select,input{width:100%;padding:14px;border-radius:10px;background:#292a30;color:white;border:1px solid #45464e;margin:8px 0;font-size:15px}
+button{background:#c8a77b;color:#171717;border:0;border-radius:11px;padding:14px;font-size:15px;font-weight:bold;width:100%;cursor:pointer;margin-top:9px}
+button.secondary{background:#33343a;color:white}
+.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #34353a}
+.price{color:#c8a77b}
+.total{font-size:25px;color:#c8a77b;font-weight:bold}
+.warning{display:none;background:#49351f;color:#ffd49c;padding:13px;border-radius:10px;margin-top:12px;line-height:1.5}
+footer{text-align:center;color:#666;font-size:12px;padding:25px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">ROOM<span>IX</span></div>
+<div class="tag">AI INTERIOR DESIGN</div>
+</header>
+
+<h1>Создай пространство своей мечты</h1>
+<p>Загрузи фотографию комнаты. Подбери материалы, мебель и освещение. Рассчитай бюджет проекта.</p>
+
+<div class="card">
+<h2>01. Твоя комната</h2>
+<label class="upload">
+📷<br><br>Нажми, чтобы загрузить фотографию
+<input type="file" id="photo" accept="image/*">
+</label>
+<img id="preview">
+</div>
+
+<div class="card">
+<h2>02. Материалы и отделка</h2>
+<label>Стены</label>
+<select id="walls">
+<option value="0">Без изменений</option>
+<option value="5000">Покраска — 5 000 ₽</option>
+<option value="12000">Декоративная штукатурка — 12 000 ₽</option>
+<option value="18000">Обои — 18 000 ₽</option>
+<option value="25000">Декоративные панели — 25 000 ₽</option>
+</select>
+
+<label>Пол</label>
+<select id="floor">
+<option value="0">Без изменений</option>
+<option value="15000">Ламинат — 15 000 ₽</option>
+<option value="25000">Кварцвинил — 25 000 ₽</option>
+<option value="35000">Инженерная доска — 35 000 ₽</option>
+<option value="20000">Керамогранит — 20 000 ₽</option>
+</select>
+
+<label>Освещение</label>
+<select id="light">
+<option value="0">Без изменений</option>
+<option value="5000">Точечное освещение — 5 000 ₽</option>
+<option value="12000">Трековая система — 12 000 ₽</option>
+<option value="18000">Дизайнерская люстра — 18 000 ₽</option>
+<option value="10000">Светодиодная подсветка — 10 000 ₽</option>
+</select>
+</div>
+
+<div class="card">
+<h2>03. Мебель и предметы</h2>
+<div id="catalog">
+<div class="item">🛋 Диван <span class="price">35 000 ₽</span></div>
+<div class="item">🪑 Кресло <span class="price">12 000 ₽</span></div>
+<div class="item">🪞 Зеркало <span class="price">6 000 ₽</span></div>
+<div class="item">🪴 Растение <span class="price">2 500 ₽</span></div>
+<div class="item">🪵 Журнальный столик <span class="price">8 000 ₽</span></div>
+</div>
+
+<label>Добавить свою позицию</label>
+<input id="customName" placeholder="Например, дизайнерский столик">
+<input id="customPrice" type="number" placeholder="Стоимость в рублях">
+<button class="secondary" onclick="addItem()">+ Добавить предмет</button>
+</div>
+
+<div class="card">
+<h2>04. Смета проекта</h2>
+<div id="estimate"></div>
+<p>Предварительная стоимость:</p>
+<div class="total" id="total">0 ₽</div>
+<p>Стоимость ориентировочная. Цены можно корректировать.</p>
+</div>
+
+<div id="warning" class="warning">
+⚠️ Внимание! Изменения могут частично изменить первоначальную стилистику и направление дизайна комнаты.
+</div>
+
+<button onclick="calculate()">Пересчитать смету</button>
+
+<footer>ROOMIX © 2026 · Пространство начинается с идеи</footer>
+
+<script>
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+
+let furniture = [];
+
+const prices = {
+walls:"Стены",
+floor:"Пол",
+light:"Освещение"
+};
+
+function calculate(){
+let total=0;
+let html="";
+
+Object.keys(prices).forEach(id=>{
+const value=Number(document.getElementById(id).value);
+if(value){
+total+=value;
+html+=`<div class="item">${prices[id]} <span>${value.toLocaleString('ru-RU')} ₽</span></div>`;
+}
+});
+
+furniture.forEach(item=>{
+total+=item.price;
+html+=`<div class="item">${item.name} <span>${item.price.toLocaleString('ru-RU')} ₽</span></div>`;
+});
+
+document.getElementById("estimate").innerHTML=html||"Пока ничего не выбрано";
+document.getElementById("total").textContent=total.toLocaleString('ru-RU')+" ₽";
+}
+
+function addItem(){
+const name=document.getElementById("customName").value.trim();
+const price=Number(document.getElementById("customPrice").value);
+
+if(!name||price<=0){
+alert("Укажи название и стоимость предмета");
+return;
+}
+
+furniture.push({name,price});
+
+const item=document.createElement("div");
+item.className="item";
+item.textContent=name+" — "+price.toLocaleString('ru-RU')+" ₽";
+document.getElementById("catalog").appendChild(item);
+
+document.getElementById("customName").value="";
+document.getElementById("customPrice").value="";
+
+calculate();
+document.getElementById("warning").style.display="block";
+}
+
+document.querySelectorAll("select").forEach(select=>{
+select.addEventListener("change",()=>{
+calculate();
+document.getElementById("warning").style.display="block";
+});
+});
+
+document.getElementById("photo").addEventListener("change",function(){
+const file=this.files[0];
+if(!file)return;
+
+const reader=new FileReader();
+reader.onload=e=>{
+const preview=document.getElementById("preview");
+preview.src=e.target.result;
+preview.style.display="block";
+};
+reader.readAsDataURL(file);
+});
+
+calculate();
+</script>
+</body>
+</html>
+
