@@ -3,191 +3,276 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROOMIX — Дизайн интерьера</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#eaf6f2">
+<title>ROOMIX — Твой интерьер</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101114;color:#f5f5f5;font-family:Arial,sans-serif;padding:20px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
-.logo{font-size:27px;font-weight:900;letter-spacing:3px}
-.logo span{color:#c8a77b}
-.tag{color:#999;font-size:12px}
-h1{font-size:29px;margin:10px 0}
-p{color:#aaa;line-height:1.5}
-.card{background:#1c1d21;border:1px solid #303137;border-radius:17px;padding:17px;margin:16px 0}
-h2{font-size:17px;margin:0 0 15px}
-.upload{border:1px dashed #777;border-radius:13px;padding:28px 12px;text-align:center;cursor:pointer;color:#ccc;display:block}
-.upload input{display:none}
-#preview{width:100%;border-radius:12px;margin-top:12px;display:none}
-select,input{width:100%;padding:14px;border-radius:10px;background:#292a30;color:white;border:1px solid #45464e;margin:8px 0;font-size:15px}
-button{background:#c8a77b;color:#171717;border:0;border-radius:11px;padding:14px;font-size:15px;font-weight:bold;width:100%;cursor:pointer;margin-top:9px}
-button.secondary{background:#33343a;color:white}
-.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #34353a}
-.price{color:#c8a77b}
-.total{font-size:25px;color:#c8a77b;font-weight:bold}
-.warning{display:none;background:#49351f;color:#ffd49c;padding:13px;border-radius:10px;margin-top:12px;line-height:1.5}
-footer{text-align:center;color:#666;font-size:12px;padding:25px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#edf6f3;color:#193b39}
+header{background:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #dfebe7}
+.logo{font-size:27px;font-weight:900;letter-spacing:2px}
+.logo span{color:#42b9a9}
+header small{color:#829b95}
+main{max-width:1450px;margin:auto;padding:25px 18px}
+h1{font-size:30px;margin-bottom:8px}
+.subtitle{color:#829b95;margin-bottom:23px}
+.layout{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+.panel{background:#fff;border:1px solid #e1ece8;border-radius:18px;padding:18px;margin-bottom:17px;box-shadow:0 5px 20px #315b5010}
+.heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.heading h2{font-size:17px}
+.tag{background:#e8f7f2;color:#329f91;border-radius:20px;padding:7px 10px;font-size:10px}
+.room{height:340px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#d9e9df,#a9cfc2);display:flex;align-items:center;justify-content:center;text-align:center;position:relative}
+.room img{width:100%;height:100%;object-fit:cover;display:none}
+.placeholder{padding:20px}
+.placeholder .house{font-size:75px}
+.placeholder h3{margin:12px 0}
+.placeholder p{color:#55796e;font-size:13px}
+button{cursor:pointer;font:inherit}
+.btn{border:0;background:#244e49;color:#fff;padding:12px 17px;border-radius:10px;margin-top:14px}
+.tools{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.tool{background:#f0f7f4;border:1px solid #e2eee9;padding:10px;border-radius:9px;font-size:12px}
+.categories{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.category{border:1px solid #e2ece8;background:#fff;border-radius:12px;padding:13px 4px;font-size:12px;color:#31534d}
+.category span{display:block;font-size:24px;margin-bottom:6px}
+.category.active{background:#e7f7f2;border:1px solid #43b9a9;color:#21988c}
+.catalog{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}
+.product{border:1px solid #e4eeea;border-radius:13px;padding:12px}
+.visual{height:75px;background:#eff7f3;border-radius:10px;display:grid;place-items:center;font-size:38px;margin-bottom:9px}
+.product strong{font-size:13px}
+.product small{display:block;color:#829b95;margin-top:5px}
+.product-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px}
+.add{border:0;background:#43b9a9;color:#fff;border-radius:8px;width:30px;height:30px;font-size:20px}
+.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #e9f0ed}
+.item-icon{font-size:25px;background:#edf7f3;padding:10px;border-radius:10px}
+.item-info{flex:1;min-width:0}
+.item-info strong{font-size:13px}
+.item-info small{display:block;color:#829b95;margin-top:4px}
+.remove{border:0;background:transparent;color:#d76d70;font-size:20px}
+.total{background:#eaf7f2;padding:16px;border-radius:12px;margin-top:15px;display:flex;justify-content:space-between;align-items:center}
+.total strong{font-size:20px}
+.custom{margin-top:20px;border-top:1px solid #e6efeb;padding-top:17px}
+.custom input{width:100%;padding:12px;border:1px solid #dce9e4;border-radius:9px;margin-top:9px;outline:none}
+.custom button{background:#244e49;color:#fff;border:0;padding:12px;border-radius:9px;margin-top:9px}
+.save{width:100%;padding:16px;border:0;border-radius:12px;background:linear-gradient(100deg,#43b9a9,#268f86);color:white;font-weight:bold;margin-top:17px}
+.note{font-size:11px;color:#829b95;line-height:1.5;margin-top:12px}
+@media(max-width:750px){.layout{grid-template-columns:1fr}h1{font-size:25px}.room{height:270px}}
 </style>
 </head>
 <body>
 <header>
 <div class="logo">ROOM<span>IX</span></div>
-<div class="tag">AI INTERIOR DESIGN</div>
+<small>YOUR DESIGN STUDIO ✦</small>
 </header>
 
-<h1>Создай пространство своей мечты</h1>
-<p>Загрузи фотографию комнаты. Подбери материалы, мебель и освещение. Рассчитай бюджет проекта.</p>
+<main>
+<h1>Дом твоей мечты начинается здесь</h1>
+<p class="subtitle">Создай интерьер, в котором хочется жить.</p>
 
-<div class="card">
-<h2>01. Твоя комната</h2>
-<label class="upload">
-📷<br><br>Нажми, чтобы загрузить фотографию
-<input type="file" id="photo" accept="image/*">
-</label>
-<img id="preview">
+<div class="layout">
+<div>
+<section class="panel">
+<div class="heading">
+<h2>🏡 Твоя комната</h2>
+<span class="tag">МОЙ ПРОЕКТ</span>
+</div>
+<div class="room">
+<div class="placeholder" id="placeholder">
+<div class="house">🏡</div>
+<h3>Твоё пространство</h3>
+<p>Загрузи фотографию комнаты и начни создавать интерьер.</p>
+<button class="btn" onclick="document.getElementById('photo').click()">＋ Загрузить фото</button>
+</div>
+<img id="roomImage" alt="Моя комната">
+</div>
+<input type="file" id="photo" accept="image/*" hidden>
+<div class="tools">
+<button class="tool" onclick="document.getElementById('photo').click()">📷 Изменить фото</button>
+<button class="tool" onclick="alert('3D-просмотр добавим следующим этапом')">◈ 3D-просмотр</button>
+</div>
+</section>
+
+<section class="panel">
+<div class="heading">
+<h2>📦 Твой комплект</h2>
+<span class="tag" id="count">0 ПОЗИЦИЙ</span>
+</div>
+<div id="kit"> <p style="color:#829b95;font-size:13px">Добавь первые элементы своего интерьера.</p></div>
+<div class="total">
+<div>Предварительная смета<br><strong id="total">0 ₽</strong></div>
+<span>💰</span>
+</div>
+</section>
 </div>
 
-<div class="card">
-<h2>02. Материалы и отделка</h2>
-<label>Стены</label>
-<select id="walls">
-<option value="0">Без изменений</option>
-<option value="5000">Покраска — 5 000 ₽</option>
-<option value="12000">Декоративная штукатурка — 12 000 ₽</option>
-<option value="18000">Обои — 18 000 ₽</option>
-<option value="25000">Декоративные панели — 25 000 ₽</option>
-</select>
-
-<label>Пол</label>
-<select id="floor">
-<option value="0">Без изменений</option>
-<option value="15000">Ламинат — 15 000 ₽</option>
-<option value="25000">Кварцвинил — 25 000 ₽</option>
-<option value="35000">Инженерная доска — 35 000 ₽</option>
-<option value="20000">Керамогранит — 20 000 ₽</option>
-</select>
-
-<label>Освещение</label>
-<select id="light">
-<option value="0">Без изменений</option>
-<option value="5000">Точечное освещение — 5 000 ₽</option>
-<option value="12000">Трековая система — 12 000 ₽</option>
-<option value="18000">Дизайнерская люстра — 18 000 ₽</option>
-<option value="10000">Светодиодная подсветка — 10 000 ₽</option>
-</select>
+<section class="panel">
+<div class="heading">
+<h2>✦ Конструктор интерьера</h2>
+<span class="tag">DESIGN STUDIO</span>
+</div>
+<p style="font-size:13px;margin-bottom:12px">Выбери категорию</p>
+<div class="categories">
+<button class="category active" onclick="category('furniture',this)"><span>🛋️</span>Мебель</button>
+<button class="category" onclick="category('walls',this)"><span>🎨</span>Стены</button>
+<button class="category" onclick="category('floor',this)"><span>🪵</span>Пол</button>
+<button class="category" onclick="category('light',this)"><span>💡</span>Свет</button>
+<button class="category" onclick="category('decor',this)"><span>🪴</span>Декор</button>
+<button class="category" onclick="category('other',this)"><span>✧</span>Другое</button>
 </div>
 
-<div class="card">
-<h2>03. Мебель и предметы</h2>
-<div id="catalog">
-<div class="item">🛋 Диван <span class="price">35 000 ₽</span></div>
-<div class="item">🪑 Кресло <span class="price">12 000 ₽</span></div>
-<div class="item">🪞 Зеркало <span class="price">6 000 ₽</span></div>
-<div class="item">🪴 Растение <span class="price">2 500 ₽</span></div>
-<div class="item">🪵 Журнальный столик <span class="price">8 000 ₽</span></div>
+<div style="margin-top:22px">
+<div class="heading"><h2 id="catalogTitle">Каталог мебели</h2></div>
+<div class="catalog" id="catalog"></div>
 </div>
 
-<label>Добавить свою позицию</label>
-<input id="customName" placeholder="Например, дизайнерский столик">
-<input id="customPrice" type="number" placeholder="Стоимость в рублях">
-<button class="secondary" onclick="addItem()">+ Добавить предмет</button>
+<div class="custom">
+<h3 style="font-size:15px">＋ Добавить свою позицию</h3>
+<input id="customName" placeholder="Название предмета">
+<input id="customPrice" type="number" min="0" placeholder="Стоимость в рублях">
+<button onclick="addCustom()">Добавить в комплект</button>
 </div>
 
-<div class="card">
-<h2>04. Смета проекта</h2>
-<div id="estimate"></div>
-<p>Предварительная стоимость:</p>
-<div class="total" id="total">0 ₽</div>
-<p>Стоимость ориентировочная. Цены можно корректировать.</p>
+<button class="save" onclick="saveProject()">✓ Сохранить дизайн</button>
+<p class="note">Изменение первоначального стиля комнаты может повлиять на общую стилистику интерьера. Продолжай экспериментировать осознанно.</p>
+</section>
 </div>
-
-<div id="warning" class="warning">
-⚠️ Внимание! Изменения могут частично изменить первоначальную стилистику и направление дизайна комнаты.
-</div>
-
-<button onclick="calculate()">Пересчитать смету</button>
-
-<footer>ROOMIX © 2026 · Пространство начинается с идеи</footer>
+</main>
 
 <script>
-const tg = window.Telegram?.WebApp;
-tg?.ready();
-tg?.expand();
-
-let furniture = [];
-
-const prices = {
-walls:"Стены",
-floor:"Пол",
-light:"Освещение"
+const data={
+furniture:[
+['🛋️','Диван','Современный',65000],
+['🪑','Кресло','Комфорт',25000],
+['🪞','Зеркало','Настенное',8500],
+['🪵','Журнальный столик','Минимализм',12000],
+['🗄️','Комод','Современный',22000],
+['🛏️','Кровать','Премиум',55000]
+],
+walls:[
+['🎨','Молочная краска','Тёплый оттенок',4500],
+['🩵','Бирюзовая краска','Пастельный оттенок',5200],
+['🧱','Декоративная штукатурка','Фактура',12000],
+['🌿','Деревянные панели','Натуральные',18000]
+],
+floor:[
+['🪵','Ламинат','Дуб',8500],
+['🪨','Керамогранит','Плитка',12000],
+['🌳','Паркет','Натуральное дерево',25000],
+['🧶','Ковёр','Мягкий',7000]
+],
+light:[
+['💡','Люстра','Современная',14000],
+['🟡','Торшер','Мягкий свет',8500],
+['✨','LED-подсветка','Атмосфера',4500],
+['🔆','Светильники','Потолочные',6500]
+],
+decor:[
+['🪴','Растение','Живой декор',3500],
+['🖼️','Картина','Настенный декор',5000],
+['🕯️','Свечи','Уют',1200],
+['🪞','Зеркало','Декоративное',9000]
+],
+other:[
+['📺','Телевизор','Техника',45000],
+['🔊','Акустика','Звук',18000],
+['🧺','Хранение','Организация',8000],
+['🪟','Шторы','Текстиль',6500]
+]
 };
 
-function calculate(){
-let total=0;
-let html="";
+let items=[];
+let current='furniture';
 
-Object.keys(prices).forEach(id=>{
-const value=Number(document.getElementById(id).value);
-if(value){
-total+=value;
-html+=`<div class="item">${prices[id]} <span>${value.toLocaleString('ru-RU')} ₽</span></div>`;
-}
-});
-
-furniture.forEach(item=>{
-total+=item.price;
-html+=`<div class="item">${item.name} <span>${item.price.toLocaleString('ru-RU')} ₽</span></div>`;
-});
-
-document.getElementById("estimate").innerHTML=html||"Пока ничего не выбрано";
-document.getElementById("total").textContent=total.toLocaleString('ru-RU')+" ₽";
+function category(type,button){
+current=type;
+document.querySelectorAll('.category').forEach(b=>b.classList.remove('active'));
+button.classList.add('active');
+const names={furniture:'Каталог мебели',walls:'Материалы стен',floor:'Материалы пола',light:'Освещение',decor:'Декор и растения',other:'Дополнительные элементы'};
+document.getElementById('catalogTitle').textContent=names[type];
+renderCatalog();
 }
 
-function addItem(){
-const name=document.getElementById("customName").value.trim();
-const price=Number(document.getElementById("customPrice").value);
-
-if(!name||price<=0){
-alert("Укажи название и стоимость предмета");
-return;
+function renderCatalog(){
+const box=document.getElementById('catalog');
+box.innerHTML='';
+data[current].forEach(p=>{
+const el=document.createElement('div');
+el.className='product';
+el.innerHTML=`<div class="visual">${p[0]}</div><strong></strong><small></small><div class="product-bottom"><b>${p[3].toLocaleString('ru-RU')} ₽</b><button class="add">+</button></div>`;
+el.querySelector('strong').textContent=p[1];
+el.querySelector('small').textContent=p[2];
+el.querySelector('.add').onclick=()=>addItem(p);
+box.appendChild(el);
+});
 }
 
-furniture.push({name,price});
-
-const item=document.createElement("div");
-item.className="item";
-item.textContent=name+" — "+price.toLocaleString('ru-RU')+" ₽";
-document.getElementById("catalog").appendChild(item);
-
-document.getElementById("customName").value="";
-document.getElementById("customPrice").value="";
-
-calculate();
-document.getElementById("warning").style.display="block";
+function addItem(p){
+items.push({id:Date.now()+Math.random(),icon:p[0],name:p[1],description:p[2],price:Number(p[3])});
+renderKit();
 }
 
-document.querySelectorAll("select").forEach(select=>{
-select.addEventListener("change",()=>{
-calculate();
-document.getElementById("warning").style.display="block";
-});
-});
+function addCustom(){
+const name=document.getElementById('customName').value.trim();
+const price=Number(document.getElementById('customPrice').value);
+if(!name){alert('Введи название предмета');return}
+if(!Number.isFinite(price)||price<0||document.getElementById('customPrice').value===''){alert('Укажи корректную стоимость');return}
+addItem(['✦',name,'Собственная позиция',price]);
+document.getElementById('customName').value='';
+document.getElementById('customPrice').value='';
+}
 
-document.getElementById("photo").addEventListener("change",function(){
-const file=this.files[0];
+function removeItem(id){
+items=items.filter(x=>x.id!==id);
+renderKit();
+}
+
+function renderKit(){
+const box=document.getElementById('kit');
+box.innerHTML='';
+if(!items.length){
+box.textContent='Добавь первые элементы своего интерьера.';
+box.style.color='#829b95';
+box.style.fontSize='13px';
+}else{
+box.style.color='';
+items.forEach(x=>{
+const row=document.createElement('div');
+row.className='item';
+row.innerHTML=`<div class="item-icon">${x.icon}</div><div class="item-info"><strong></strong><small></small></div><b>${x.price.toLocaleString('ru-RU')} ₽</b><button class="remove">×</button>`;
+row.querySelector('strong').textContent=x.name;
+row.querySelector('small').textContent=x.description;
+row.querySelector('.remove').onclick=()=>removeItem(x.id);
+box.appendChild(row);
+});
+}
+document.getElementById('count').textContent=items.length+' ПОЗИЦИЙ';
+document.getElementById('total').textContent=items.reduce((s,x)=>s+x.price,0).toLocaleString('ru-RU')+' ₽';
+}
+
+document.getElementById('photo').addEventListener('change',e=>{
+const file=e.target.files[0];
 if(!file)return;
-
+if(!file.type.startsWith('image/')){alert('Выбери фотографию');return}
 const reader=new FileReader();
-reader.onload=e=>{
-const preview=document.getElementById("preview");
-preview.src=e.target.result;
-preview.style.display="block";
+reader.onload=()=>{
+const img=document.getElementById('roomImage');
+img.src=reader.result;
+img.style.display='block';
+document.getElementById('placeholder').style.display='none';
 };
 reader.readAsDataURL(file);
 });
 
-calculate();
+function saveProject(){
+try{
+localStorage.setItem('roomix-project',JSON.stringify(items));
+alert('Комплект сохранён на этом устройстве!');
+}catch(e){
+alert('Не удалось сохранить проект');
+}
+}
+
+renderCatalog();
+renderKit();
 </script>
 </body>
 </html>
