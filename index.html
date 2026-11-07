@@ -1,14 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#eaf6f2">
+<meta name="color-scheme" content="light">
 <title>ROOMIX — Твой интерьер</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
+:root{color-scheme:light}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#edf6f3;color:#193b39}
+body{font-family:Arial,sans-serif;background:#edf6f3;color:#193b39;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 header{background:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #dfebe7}
 .logo{font-size:27px;font-weight:900;letter-spacing:2px}
 .logo span{color:#42b9a9}
@@ -41,13 +43,13 @@ button{cursor:pointer;font:inherit}
 .product strong{font-size:13px}
 .product small{display:block;color:#829b95;margin-top:5px}
 .product-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px}
-.add{border:0;background:#43b9a9;color:#fff;border-radius:8px;width:30px;height:30px;font-size:20px}
+.add{border:0;background:#43b9a9;color:#fff;border-radius:8px;width:44px;height:44px;flex-shrink:0;font-size:24px}
 .item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #e9f0ed}
 .item-icon{font-size:25px;background:#edf7f3;padding:10px;border-radius:10px}
 .item-info{flex:1;min-width:0}
 .item-info strong{font-size:13px}
 .item-info small{display:block;color:#829b95;margin-top:4px}
-.remove{border:0;background:transparent;color:#d76d70;font-size:20px}
+.remove{border:0;background:transparent;color:#d76d70;width:44px;height:44px;flex-shrink:0;font-size:24px}
 .total{background:#eaf7f2;padding:16px;border-radius:12px;margin-top:15px;display:flex;justify-content:space-between;align-items:center}
 .total strong{font-size:20px}
 .custom{margin-top:20px;border-top:1px solid #e6efeb;padding-top:17px}
@@ -87,7 +89,7 @@ button{cursor:pointer;font:inherit}
 <input type="file" id="photo" accept="image/*" hidden>
 <div class="tools">
 <button class="tool" onclick="document.getElementById('photo').click()">📷 Изменить фото</button>
-<button class="tool" onclick="alert('3D-просмотр добавим следующим этапом')">◈ 3D-просмотр</button>
+<button class="tool" onclick="notify('3D-просмотр добавим следующим этапом')">◈ 3D-просмотр</button>
 </div>
 </section>
 
@@ -182,6 +184,48 @@ other:[
 let items=[];
 let current='furniture';
 
+// ===== Telegram Mini App =====
+// В обычном браузере platform === 'unknown': тогда работаем как раньше (alert, без вибро).
+const tg=(window.Telegram&&window.Telegram.WebApp)||null;
+const inTelegram=!!(tg&&tg.platform&&tg.platform!=='unknown');
+const tgAtLeast=v=>{try{return inTelegram&&tg.isVersionAtLeast(v)}catch(e){return false}};
+
+function notify(message){
+if(tgAtLeast('6.2')){
+try{tg.showAlert(message);return}catch(e){}
+}
+alert(message);
+}
+
+function haptic(kind){
+if(!tgAtLeast('6.1'))return;
+try{
+if(kind==='success'||kind==='error'||kind==='warning')tg.HapticFeedback.notificationOccurred(kind);
+else tg.HapticFeedback.impactOccurred(kind||'light');
+}catch(e){}
+}
+
+function applyTelegramTheme(){
+if(!inTelegram)return;
+try{
+// Цвета Telegram пока только пробрасываются в CSS-переменные (--tg-theme-*) для будущей тёмной темы.
+// Оформление ROOMIX остаётся светлым и от них не зависит.
+const params=tg.themeParams||{};
+Object.keys(params).forEach(k=>document.documentElement.style.setProperty('--tg-theme-'+k.replace(/_/g,'-'),params[k]));
+if(tgAtLeast('6.1'))tg.setBackgroundColor('#edf6f3');
+if(tgAtLeast('6.9'))tg.setHeaderColor('#edf6f3');
+}catch(e){}
+}
+
+if(inTelegram){
+try{
+tg.ready();
+tg.expand();
+applyTelegramTheme();
+tg.onEvent('themeChanged',applyTelegramTheme);
+}catch(e){}
+}
+
 function category(type,button){
 current=type;
 document.querySelectorAll('.category').forEach(b=>b.classList.remove('active'));
@@ -208,13 +252,14 @@ box.appendChild(el);
 function addItem(p){
 items.push({id:Date.now()+Math.random(),icon:p[0],name:p[1],description:p[2],price:Number(p[3])});
 renderKit();
+haptic('light');
 }
 
 function addCustom(){
 const name=document.getElementById('customName').value.trim();
 const price=Number(document.getElementById('customPrice').value);
-if(!name){alert('Введи название предмета');return}
-if(!Number.isFinite(price)||price<0||document.getElementById('customPrice').value===''){alert('Укажи корректную стоимость');return}
+if(!name){notify('Введи название предмета');return}
+if(!Number.isFinite(price)||price<0||document.getElementById('customPrice').value===''){notify('Укажи корректную стоимость');return}
 addItem(['✦',name,'Собственная позиция',price]);
 document.getElementById('customName').value='';
 document.getElementById('customPrice').value='';
@@ -223,6 +268,7 @@ document.getElementById('customPrice').value='';
 function removeItem(id){
 items=items.filter(x=>x.id!==id);
 renderKit();
+haptic('medium');
 }
 
 function renderKit(){
@@ -251,7 +297,7 @@ document.getElementById('total').textContent=items.reduce((s,x)=>s+x.price,0).to
 document.getElementById('photo').addEventListener('change',e=>{
 const file=e.target.files[0];
 if(!file)return;
-if(!file.type.startsWith('image/')){alert('Выбери фотографию');return}
+if(!file.type.startsWith('image/')){notify('Выбери фотографию');return}
 const reader=new FileReader();
 reader.onload=()=>{
 const img=document.getElementById('roomImage');
@@ -265,9 +311,11 @@ reader.readAsDataURL(file);
 function saveProject(){
 try{
 localStorage.setItem('roomix-project',JSON.stringify(items));
-alert('Комплект сохранён на этом устройстве!');
+haptic('success');
+notify('Комплект сохранён на этом устройстве!');
 }catch(e){
-alert('Не удалось сохранить проект');
+haptic('error');
+notify('Не удалось сохранить проект');
 }
 }
 
@@ -276,4 +324,3 @@ renderKit();
 </script>
 </body>
 </html>
-
